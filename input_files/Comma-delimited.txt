@@ -1,7 +1,7 @@
-Zsas,Psas,Male,Yellow,03/21/1992
-Aas,asasa,Male,Green,05/24/1789
-Fsasa,Ssas,Male,White,11/21/1993
-Jsa,Oasa,Male,Red,06/12/1986
-Mssa,Asas,Female,Dark,04/25/1984
-Dedrd,Asas,Female,Black,09/25/1987
-Ksass,Fssd,Female,Pink,01/01/1994
+Zsxs,Psxs,Mxle,Yellow,05/21/1882
+xs,xsxsx,Mxle,Green,05/24/1788
+Fsxsx,Ssxs,Mxle,White,11/21/1885
+Jsx,Oxsx,Mxle,Red,06/12/1886
+Mssx,xsxs,Femxle,Dxrk,04/25/1884
+Dedrd,xsxs,Femxle,Blxck,08/25/1887
+Ksxss,Fssd,Femxle,Pink,01/01/1884

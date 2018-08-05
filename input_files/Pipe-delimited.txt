@@ -1,7 +1,7 @@
-Zsas|Psas|Male|Yellow|03/21/1992
-Aas|asasa|Male|Green|05/24/1789
-Fsasa|Ssas|Male|White|11/21/1993
-Jsasa|Oasa|Male|Red|06/12/1986
-Mssa|Asas|Female|Dark|04/25/1984
-Dedrd|Asas|Female|Black|09/25/1987
-Ksass|Fssd|Female|Pink|01/01/1994
+Zmam|Pmam|Male|Yellow|03/21/1987
+Aam|amama|Male|Green|05/24/1789
+Fmama|mmam|Male|White|11/21/1993
+Jmama|Oama|Male|Red|06/12/1986
+Mmma|Amam|Female|Dark|04/25/1984
+Dedrd|Amam|Female|Black|09/25/1987
+Kmamm|Fmmd|Female|Pink|01/01/1994
