@@ -1,7 +1,7 @@
-Zsxs,Psxs,Mxle,Yellow,05/21/1882
-xs,xsxsx,Mxle,Green,05/24/1788
-Fsxsx,Ssxs,Mxle,White,11/21/1885
-Jsx,Oxsx,Mxle,Red,06/12/1886
-Mssx,xsxs,Femxle,Dxrk,04/25/1884
-Dedrd,xsxs,Femxle,Blxck,08/25/1887
-Ksxss,Fssd,Femxle,Pink,01/01/1884
+Zsxs,Psxs,Male,Yellow,05/21/1882
+xs,xsxsx,Male,Green,05/24/1788
+Fsxsx,Ssxs,Male,White,11/21/1885
+Jsx,Oxsx,Male,Red,06/12/1886
+Mssx,xsxs,Female,Dxrk,04/25/1884
+Dedrd,xsxs,Female,Blxck,08/25/1887
+Ksxss,Fssd,Female,Pink,01/01/1884
