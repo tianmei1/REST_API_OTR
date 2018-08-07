@@ -3,21 +3,28 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
+var https = require('https');
 const readline = require('readline');
+const request = require('request');
+var $ = require('jQuery');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-var prompts = readline.createInterface({
+//create question for user. Based on user input to show defffrient Outputs.
+var rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-//file floder url
+//file folder url
 const inputfile_dir = './input_files';
 //push the name of all files into array.
 var fileNameArray = [];
 var fileName;
-//get the number of files in the input_files floder.
 var fileContents = {};
+var allRecordsArray;
+//get_files function defined to return all records in all files.
 var get_files = function (result) {
+    //read './input_files' folder and get all files in this folder.
     fs.readdir(inputfile_dir, function (err, files) {
         if (err) {
             console.log(err);
@@ -29,6 +36,7 @@ var get_files = function (result) {
             if (fileName !== undefined && fileName !== null) {
                 fileNameArray.push(fileName);
                 try {
+                    //push records into fileContents array.
                     fileContents[fileName] = fs.readFileSync(fileUrl, "utf-8");
                 } catch (err) {
                     if (err.code === 'ENOENT') {
@@ -42,6 +50,7 @@ var get_files = function (result) {
                 console.log('found file with wrong filename');
             }
         }
+        console.log('You have put totally '+fileNameArray.length +' files in the input_files folder');
         return result(fileContents);
     });
 }
@@ -50,11 +59,13 @@ console.log("*Output-1: sorted by gender (females before males) then by last nam
 console.log("*Output-2: sorted by birth date, ascending.");
 console.log("*Output-3: sorted by last name, descending.");
 console.log('---------------------------------------------------------------------------------------');
+//callback get_files function to get records store in return result.
+function getRecordsArray(callback){
 get_files(function (result) {
-    prompts.question("Please enter the output type number. Type 1 or 2 or 3:" + "   ", function (inputNumber) {
+    rl.question("Please choose one Output type. Enter 1 or 2 or 3:" + "   ", function (inputNumber) {
+        var recordArray = {};
         var messgaeForInputFileName = "";
         var recordsArray = [];
-        var recordJson = {};
         if (inputNumber === '1') {
             messgaeForInputFileName = "The output-" + inputNumber + " is as following:";
             console.log(messgaeForInputFileName);
@@ -78,7 +89,7 @@ get_files(function (result) {
                 }
                 console.log(i + ' ' + output1Array[i]);
             }
-            recordJson = output1Array;
+            recordArray = output1Array;
         }
         else if (inputNumber === '2') {
             messgaeForInputFileName = "The output-" + inputNumber + " is as following:";
@@ -103,7 +114,7 @@ get_files(function (result) {
                 }
                 console.log(i + ' ' + output2Array[i]);
             }
-            recordJson = output2Array;
+            recordArray = output2Array;
         }
         else if (inputNumber === '3') {
             messgaeForInputFileName = "The output-" + inputNumber + " is as following:";
@@ -128,29 +139,121 @@ get_files(function (result) {
                 }
                 console.log(i + ' ' + output3Array[i]);
             }
-            recordJson = output3Array;
+            recordArray = output3Array;
         }
         else {
             messgaeForInputFileName = "Sorry, You can only enter 1 or 2 or 3";
             console.log(messgaeForInputFileName);
         }
+        // xmlhttp = new XMLHttpRequest();
+        // xmlhttp.open("GET","http://localhost:3000/records", true);
+        // xmlhttp.onreadystatechange=function(){
+        //       if (xmlhttp.readyState==4 && xmlhttp.status==200){
+        //         string=xmlhttp.responseText;
+        //       }
+        // }
+        // xmlhttp.send(arrayToJson(recordArray));
+
+        var data = arrayToJson(recordArray);
+        request.post(
+            'http://localhost:3000/records',
+            data,
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body)
+                }
+            }
+        );
         // const server = http.createServer((req, res) =>{
-        app.get('/', (req, res) => {
-            res.send('POST /records - accepts a record, or json array of records.<br>' +
-                'GET /records/gender - returns all records in json format, sorted by gender<br>' +
-                'GET /records/birthdate - returns all records in json format, sorted by birth date<br>' +
-                'GET /records/name - returns all records in json format, sorted by name');
-            res.end();
-        });
-        app.get('/records', (req, res) => {
-            res.send(arrayToJson(recordJson));
-            res.end();
-        });
-        const port = process.env.PORT || 3000;
-        app.listen(port, () => console.log('listening on port'+ port+'...'));
+        // app.get('/', (req, res) => {
+        //     res.send('POST /records - accepts a record, or json array of records.<br>' +
+        //         'GET /records/gender - returns all records in json format, sorted by gender<br>' +
+        //         'GET /records/birthdate - returns all records in json format, sorted by birth date<br>' +
+        //         'GET /records/name - returns all records in json format, sorted by name');
+        //     res.end();
+        // });
+        // app.post('http://localhost:3000/records', (req, res) => {
+        //     res.send(arrayToJson(recordArray));
+        //     res.end();
+        // });
+
+        // $.ajax({
+        //     url: "/records",
+        //     type: "POST",
+        //     dataType: "json",
+        //     data: arrayToJson(recordArray),
+        //     contentType: "application/json",
+        //     cache: false,
+        //     timeout: 5000,
+        //     complete: function() {
+        //       //called when complete
+        //       console.log('process complete');
+        //     },
+
+        //     success: function(data) {
+        //       console.log(data);
+        //       console.log('process sucess');
+        //    },
+
+        //     error: function() {
+        //       console.log('process error');
+        //     },
+        //   });
+
+        // function xhrPost() {
+        //     var data = {'sas':'ass'};
+        //     var xhr = new XMLHttpRequest();
+            // xhr.withCredentials = true;
+            // xhr.addEventListener("readystatechange", function () {
+            //   if (this.readyState === 4) {
+            //     console.log(this.responseText);
+            //   }
+            // });
+    
+            // xhr.open("POST", "http://[serverIP]:3000/records");
+            // xhr.setRequestHeader("cache-control", "no-cache");
+            // xhr.setRequestHeader("content-type", "application/json;charset=UTF-8");
+            // xhr.send(JSON.stringify(data));
+        //   }
+        // var options = {
+        //     host: 'http://localhost:3000',
+        //     port: 3000,
+        //     path: '/rescords',
+        //     method: 'POST'
+        //   };
+        // var req = https.request(options, function(res){
+        //     var res ='';
+        //     console.log('response from sever start');
+        //     res.setEncoding('utf8');
+        // }
+
+
+
+
+
+        //   request(options, function(res) {
+        //     console.log('STATUS: ' + res.statusCode);
+        //     console.log('HEADERS: ' + JSON.stringify(res.headers));
+        //     res.setEncoding('utf8');
+        //     res.on(arrayToJson(recordArray), function (chunk) {
+        //       console.log('BODY: ' + chunk);
+        //     });
+        //   }).end();
+        // request.post('http://localhost:3000/records', arrayToJson(recordArray));
+        callback(recordArray);
+        //Node server default is localhost:3000. If deployed in another host, will change to process address.
+        // const port = process.env.PORT || 3000;
+        // app.listen(port, () => console.log('listening on port'+ port+'...'));
         // process.exit();
     });
 });
+}
+function returnRecordArray(array){
+    allRecordsArray = array;
+    return allRecordsArray;
+}
+getRecordsArray(returnRecordArray);
+console.log(allRecordsArray);
 //sort array by last name ascending
 function lastNameAscending(a, b) {
     var A = a[0];
@@ -227,6 +330,7 @@ function readRecordByLine(txtstring) {
     }
     return singleRecordArray;
 }
+//Transfer array records to records in JSON. 
 function arrayToJson(recordArray){
     var recordJson={};
     for(var i=0; i< recordArray.length; i++){
