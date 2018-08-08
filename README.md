@@ -16,4 +16,12 @@ test records files:  Pipe-delimited.txt, Space-delimited.txt, Comma-delimited.tx
 
 5.comandline app will do the post automatically to the REST API server.
 
-6.You can use postman to test the get request for REST API. (google search: "postman google appstore"). 
+6.you can exit commandline app by enter ctrl+c.
+
+7.You can try open another new terminal to run commandline app and post records at the same time.
+
+8.You can use 'postman' to test the get request for REST API. (google search: "postman google appstore"). 
+
+● GET /records/gender - returns all records in json format, sorted by gender
+● GET /records/birthdate - returns all records in json format, sorted by birth date
+● GET /records/name - returns all records in json format, sorted by name
