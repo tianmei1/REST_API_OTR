@@ -2,11 +2,11 @@
 
 command line app and one server RESTful API build based on node.js
 
-js files: commandlineapp.js, server.js, methods.js.
+Three js files: commandlineapp.js, server.js, methods.js.
 
-test records files:  Pipe-delimited.txt, Space-delimited.txt, Comma-delimited.txt.
+test sample records files:  Pipe-delimited.txt, Space-delimited.txt, Comma-delimited.txt.
 
-1.cd to REST_API_OTR folder.
+1.Download REST_API_OTR folder and Open terminal, cd to REST_API_OTR folder.
 
 2.Run RESTful API by type: "node server.js".
 
