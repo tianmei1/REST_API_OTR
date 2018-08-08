@@ -23,5 +23,7 @@ test records files:  Pipe-delimited.txt, Space-delimited.txt, Comma-delimited.tx
 8.You can use 'postman' to test the get request for REST API. (google search: "postman google appstore"). 
 
 ● GET /records/gender - returns all records in json format, sorted by gender
+
 ● GET /records/birthdate - returns all records in json format, sorted by birth date
+
 ● GET /records/name - returns all records in json format, sorted by name
