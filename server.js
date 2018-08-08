@@ -11,11 +11,9 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-//use error handle in express to ensure that Express catches all errors that occur while running route handlers and middleware.
-app.use(function (err, req, res, next) {
-    console.log(err.stack);
-    res.status(500).send({ "Error": err.stack });
-});
+//TODO: use error handle in express to ensure that Express catches all errors that occur while running route handlers and middleware.
+app.use(errorhandler());
+
 //Node server default is localhost:3000. If deployed in another host, will change to process env address.
 app.set('port', process.env.PORT || 3000);
 //set default index provide a introduction for user
@@ -26,24 +24,30 @@ app.get('/', (req, res) => {
         'GET /records/name - returns all records in json format, sorted by name');
     res.end();
 });
-//store accept records as obj. 
+//assign  accept records to the variable recordArray according to not use database. TODO:put into Mysql or MongoDB. 
 var recordArray=[];
 //handler the post for '/records'. Accept array of records from step 1 (user chose the format type).
-app.post('/records', function(request, response){
-    //store all records in recordArray
+app.post('/records', function(req, res){
+    console.log('Totally '+getLenthOfRecords(req.body)+' records have been accepted');
+    //store all post records in recordArray
     //TODO: remove duplicate records.
-    recordArray = request.body.concat(recordArray);
+    //if records is not empty, write to recordArray.
+    if(getLenthOfRecords(req.body)!==0){
+    	recordArray = req.body.concat(recordArray);
+    }
     console.log(recordArray);
-    console.log('Totally '+printLenthOfJSON(recordArray)+' records have been accepted');
-	response.send(JSON.stringify({ status:"accepts records successfully!" }));
-	response.end();
+	res.send(JSON.stringify({ status:"accepts records successfully!" }));
+	res.end();
 });
 
 app.get('/records/gender', (req, res) => {
+    if (recordArray == null || recordArray == 'undefined') {
+    	res.status(404);
+    }
     var sortBysexyArray =methods.ladyFirst(recordArray);
     var jsonRecords = arrayToJson(sortBysexyArray);
     res.send(jsonRecords);
-    console.log('return all records in JSON and sorted by gender');
+    console.log('return'+ getLenthOfRecords(jsonRecords) + 'records sorted by gender and in JSON');
     res.end();
 });
 
@@ -51,6 +55,7 @@ app.get('/records/birthdate', (req, res) => {
     var sortBybirthDateArray = recordArray.sort(methods.birtDateAscending);
     var jsonRecords = arrayToJson(sortBybirthDateArray);
     res.send(jsonRecords);
+    console.log('return'+ getLenthOfRecords(jsonRecords) + 'records sorted by birthDate and in JSON');
     res.end();
 });
 
@@ -58,12 +63,13 @@ app.get('/records/name', (req, res) => {
     var sortByLastNameArray = recordArray.sort(methods.lastNameAscending);
     var jsonRecords = arrayToJson(sortByLastNameArray);
     res.send(jsonRecords);
+    console.log('return'+ getLenthOfRecords(jsonRecords) + 'records sorted by lastName and in JSON');
     res.end();
 });
 
-
-function printLenthOfJSON(obj){
-    var count = Object.keys(obj).length;
+//return total number of records.
+function getLenthOfRecords(jsonarr){
+    var count = Object.keys(jsonarr).length;
     return count;
 }
 
@@ -93,6 +99,7 @@ function arrayToJson(recordArray) {
     }
     return recordJson;
 }
+
 //////////////////////////////////
 //Start Server.
 //////////////////////////////////
