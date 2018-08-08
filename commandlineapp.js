@@ -1,13 +1,10 @@
-#!/usr/bin/env node
 //command line app read data from three types of input files. Do data parse and sort.
-const express = require('express');
-const app = express();
-const fs = require('fs');
-var https = require('https');
-const readline = require('readline');
-const request = require('request');
-var $ = require('jQuery');
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var fs = require('fs');
+var readline = require('readline');
+//use 'request' or 'http' method post data from client side to server side.
+var request = require('request');
+var http = require('http');
+var methods = require('./methods.js');
 
 //create question for user. Based on user input to show defffrient Outputs.
 var rl = readline.createInterface({
@@ -22,7 +19,7 @@ var fileNameArray = [];
 var fileName;
 var fileContents = {};
 var allRecordsArray;
-//get_files function defined to return all records in all files.
+//get_files function defined to return all records in the folder.
 var get_files = function (result) {
     //read './input_files' folder and get all files in this folder.
     fs.readdir(inputfile_dir, function (err, files) {
@@ -50,7 +47,7 @@ var get_files = function (result) {
                 console.log('found file with wrong filename');
             }
         }
-        console.log('You have put totally '+fileNameArray.length +' files in the input_files folder');
+        console.log('You have put totally ' + fileNameArray.length + ' files in the input_files folder');
         return result(fileContents);
     });
 }
@@ -59,11 +56,10 @@ console.log("*Output-1: sorted by gender (females before males) then by last nam
 console.log("*Output-2: sorted by birth date, ascending.");
 console.log("*Output-3: sorted by last name, descending.");
 console.log('---------------------------------------------------------------------------------------');
-//callback get_files function to get records store in return result.
-function getRecordsArray(callback){
+//callback get_files function to get records in result.
 get_files(function (result) {
     rl.question("Please choose one Output type. Enter 1 or 2 or 3:" + "   ", function (inputNumber) {
-        var recordArray = {};
+        var recordArray;
         var messgaeForInputFileName = "";
         var recordsArray = [];
         if (inputNumber === '1') {
@@ -145,170 +141,79 @@ get_files(function (result) {
             messgaeForInputFileName = "Sorry, You can only enter 1 or 2 or 3";
             console.log(messgaeForInputFileName);
         }
-        // xmlhttp = new XMLHttpRequest();
-        // xmlhttp.open("GET","http://localhost:3000/records", true);
-        // xmlhttp.onreadystatechange=function(){
-        //       if (xmlhttp.readyState==4 && xmlhttp.status==200){
-        //         string=xmlhttp.responseText;
-        //       }
-        // }
-        // xmlhttp.send(arrayToJson(recordArray));
-
-        var data = arrayToJson(recordArray);
-        request.post(
-            'http://localhost:3000/records',
-            data,
-            function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    console.log(body)
-                }
-            }
-        );
-        // const server = http.createServer((req, res) =>{
-        // app.get('/', (req, res) => {
-        //     res.send('POST /records - accepts a record, or json array of records.<br>' +
-        //         'GET /records/gender - returns all records in json format, sorted by gender<br>' +
-        //         'GET /records/birthdate - returns all records in json format, sorted by birth date<br>' +
-        //         'GET /records/name - returns all records in json format, sorted by name');
-        //     res.end();
-        // });
-        // app.post('http://localhost:3000/records', (req, res) => {
-        //     res.send(arrayToJson(recordArray));
-        //     res.end();
-        // });
-
-        // $.ajax({
-        //     url: "/records",
-        //     type: "POST",
-        //     dataType: "json",
-        //     data: arrayToJson(recordArray),
-        //     contentType: "application/json",
-        //     cache: false,
-        //     timeout: 5000,
-        //     complete: function() {
-        //       //called when complete
-        //       console.log('process complete');
-        //     },
-
-        //     success: function(data) {
-        //       console.log(data);
-        //       console.log('process sucess');
-        //    },
-
-        //     error: function() {
-        //       console.log('process error');
-        //     },
-        //   });
-
-        // function xhrPost() {
-        //     var data = {'sas':'ass'};
-        //     var xhr = new XMLHttpRequest();
-            // xhr.withCredentials = true;
-            // xhr.addEventListener("readystatechange", function () {
-            //   if (this.readyState === 4) {
-            //     console.log(this.responseText);
-            //   }
-            // });
-    
-            // xhr.open("POST", "http://[serverIP]:3000/records");
-            // xhr.setRequestHeader("cache-control", "no-cache");
-            // xhr.setRequestHeader("content-type", "application/json;charset=UTF-8");
-            // xhr.send(JSON.stringify(data));
-        //   }
-        // var options = {
-        //     host: 'http://localhost:3000',
-        //     port: 3000,
-        //     path: '/rescords',
-        //     method: 'POST'
-        //   };
-        // var req = https.request(options, function(res){
-        //     var res ='';
-        //     console.log('response from sever start');
-        //     res.setEncoding('utf8');
-        // }
-
-
-
-
-
-        //   request(options, function(res) {
-        //     console.log('STATUS: ' + res.statusCode);
-        //     console.log('HEADERS: ' + JSON.stringify(res.headers));
-        //     res.setEncoding('utf8');
-        //     res.on(arrayToJson(recordArray), function (chunk) {
-        //       console.log('BODY: ' + chunk);
-        //     });
-        //   }).end();
-        // request.post('http://localhost:3000/records', arrayToJson(recordArray));
-        callback(recordArray);
-        //Node server default is localhost:3000. If deployed in another host, will change to process address.
-        // const port = process.env.PORT || 3000;
-        // app.listen(port, () => console.log('listening on port'+ port+'...'));
-        // process.exit();
+        //all records store in json data.
+        // var data = arrayToJson(recordArray);
+        var data = recordArray;
+        postByRequest(data);
+        //TODO:We can also use post by http.
+        // postByHttp(data);
     });
 });
-}
-function returnRecordArray(array){
-    allRecordsArray = array;
-    return allRecordsArray;
-}
-getRecordsArray(returnRecordArray);
-console.log(allRecordsArray);
-//sort array by last name ascending
-function lastNameAscending(a, b) {
-    var A = a[0];
-    var B = b[0];
-    A = A.toLowerCase();
-    B = B.toLowerCase();
-    if (A < B) return -1;
-    if (A > B) return 1;
-    return 0;
-}
-//sort array by last name descending
-function lastNameDescending(a, b) {
-    var A = a[0];
-    var B = b[0];
-    A = A.toLowerCase();
-    B = B.toLowerCase();
-    if (A < B) return 1;
-    if (A > B) return -1;
-    return 0;
-}
-//sort array by birthDate.
-function birtDateAscending(a, b) {
-    var A = a[4];
-    var B = b[4];
-    A = Date.parse(A);
-    B = Date.parse(B);
-    if (A > B) return 1;
-    if (A < B) return -1;
-    return 0;
-}
-//return sorted array for Output-1
-function sortToOutput1(records) {
-    //sort by last name.
-    var maleSortArray = [];
-    //sort by male and female first.
-    for (var i = 0; i < records.length; i++) {
-        if (records[i][2][0] === "F") {
-            maleSortArray.push(records[i]);
-        }
+
+//share functions in method
+// var methods = {};
+// methods = {
+//     //sort array by last name ascending
+//     lastNameAscending: function (a, b) {
+//         var A = a[0];
+//         var B = b[0];
+//         A = A.toLowerCase();
+//         B = B.toLowerCase();
+//         if (A < B) return -1;
+//         if (A > B) return 1;
+//         return 0;
+//     },
+//     //sort array by last name descending
+//     lastNameDescending: function (a, b) {
+//         var A = a[0];
+//         var B = b[0];
+//         A = A.toLowerCase();
+//         B = B.toLowerCase();
+//         if (A < B) return 1;
+//         if (A > B) return -1;
+//         return 0;
+//     },
+//     //sort array by birthDate.
+//     birtDateAscending: function (a, b) {
+//         var A = a[4];
+//         var B = b[4];
+//         A = Date.parse(A);
+//         B = Date.parse(B);
+//         if (A > B) return 1;
+//         if (A < B) return -1;
+//         return 0;
+//     },
+//     //return by female first.
+//     ladyFirst: function (records) {
+//         var sexySortArray = [];
+//         for (var i = 0; i < records.length; i++) {
+//             if (records[i][2][0] === "F") {
+//                 sexySortArray.push(records[i]);
+//             }
+//         }
+//         for (var i = 0; i < records.length; i++) {
+//             if (records[i][2][0] === "M") {
+//                 sexySortArray.push(records[i]);
+//             }
+//         }
+//         return sexySortArray;
+//     },
+    //return sorted array for Output-1
+     function sortToOutput1(records) {
+        //sort by lady first.
+        var sexySortArray = methods.ladyFirst(records);
+        //sort by last name and return.
+        return (sexySortArray.sort(methods.lastNameAscending));
     }
-    for (var i = 0; i < records.length; i++) {
-        if (records[i][2][0] === "M") {
-            maleSortArray.push(records[i]);
-        }
+    //return sorted array for Output-2
+    function sortToOutput2(records) {
+        return (records.sort(methods.birtDateAscending));
     }
-    return (maleSortArray.sort(lastNameAscending));
-}
-//return sorted array for Output-2
-function sortToOutput2(records) {
-    return (records.sort(birtDateAscending));
-}
-//return sorted array for Output-3
-function sortToOutput3(records) {
-    return (records.sort(lastNameDescending));
-}
+    //return sorted array for Output-3
+    function sortToOutput3(records) {
+        return (records.sort(methods.lastNameDescending));
+    }
+// };
 //get every single record from signle file into one string array. 
 function readRecordByLine(txtstring) {
     var singleFileArray = txtstring.split('\r\n');
@@ -330,29 +235,49 @@ function readRecordByLine(txtstring) {
     }
     return singleRecordArray;
 }
-//Transfer array records to records in JSON. 
-function arrayToJson(recordArray){
-    var recordJson={};
-    for(var i=0; i< recordArray.length; i++){
-        var singlerecord = {};
-        for(var j=0; j< recordArray[i].length; j++){
-            if(j===0){
-                singlerecord['LastName']=recordArray[i][0];
-            }
-            else if(j===1){
-                singlerecord['FirstName']=recordArray[i][1];
-            }
-            else if(j===2){
-                singlerecord['Gender']=recordArray[i][2];
-            }
-            else if(j===3){
-                singlerecord['FavoriteColor']=recordArray[i][3];
-            }
-            else{
-                singlerecord['BirthDate']=recordArray[i][4];
-            }
-        }
-        recordJson[i]=singlerecord;
+
+function postByRequest(data) {
+    //*****************request method post data from client end to server*********************//
+    var options = {
+        headers: { "Connection": "close" },
+        url: 'http://localhost:3000/records',
+        method: 'POST',
+        json: true,
+        body: data
+    };
+    request(options, callback);
+}
+//get status from server.
+function callback(error, response, data) {
+    console.log('statuscode:' + response.statusCode);
+    if (!error && response.statusCode == 200) {
+        console.log('----info------', data);
     }
-    return recordJson;
+}
+//we can also use http method do post. It is also fast.
+function postByHttp(data) {
+    var headers = {
+        'Content-Type': 'application/json'
+    };
+
+    var options = {
+        host: 'localhost',
+        port: 3000,
+        path: '/records',
+        method: 'POST',
+        headers: headers
+    };
+
+    var req = http.request(options, function (res) {
+        console.log('statuscode:' + res.statusCode);
+        res.on('data', function (data) {
+            console.log('----info------' + data);
+        });
+    });
+    req.on('error', function (e) {
+        console.log('problem with request: ' + e.message);
+    });
+    // write data to request body
+    req.write(JSON.stringify(data));
+    req.end();
 }

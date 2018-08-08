@@ -18,7 +18,9 @@
   "homepage": "https://github.com/tianmei1/REST_API_OTR#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "errorhandler": "^1.5.0",
     "express": "^4.16.3",
+    "http": "0.0.0",
     "jquery": "^3.3.1",
     "request": "^2.87.0",
     "xmlhttprequest": "^1.8.0"
