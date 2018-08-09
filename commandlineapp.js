@@ -12,28 +12,33 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
-//file folder url
-const inputfile_dir = './input_files';
+//input_files folder url
+var inputfile_dir = './input_files';
 //push the name of all files into array.
 var fileNameArray = [];
 var fileName;
 var fileContents = {};
-var allRecordsArray;
+
 //get_files function defined to return all records in the folder.
-var get_files = function (result) {
+var get_files = function (callback) {
     //read './input_files' folder and get all files in this folder.
     fs.readdir(inputfile_dir, function (err, files) {
         if (err) {
             console.log(err);
             return;
         }
+        if (!files.length) {
+            return console.log('No file in input_files foler, please add your file again.');
+        }
         for (var i = 0; i < files.length; i++) {
+            //get all file names in the input_files folder.
             fileName = files[i];
-            fileUrl = "input_files/" + fileName;
+            var fileUrl = "input_files/" + fileName;
             if (fileName !== undefined && fileName !== null) {
+                //get number of files by count the file name.
                 fileNameArray.push(fileName);
                 try {
-                    //push records into fileContents array.
+                    //push string records in each file into fileContents Json array.
                     fileContents[fileName] = fs.readFileSync(fileUrl, "utf-8");
                 } catch (err) {
                     if (err.code === 'ENOENT') {
@@ -48,37 +53,39 @@ var get_files = function (result) {
             }
         }
         console.log('You have put totally ' + fileNameArray.length + ' files in the input_files folder');
-        return result(fileContents);
+        return callback(fileContents);
     });
-}
+};
 console.log('=======================================================================================');
 console.log("*Output-1: sorted by gender (females before males) then by last name ascending.");
 console.log("*Output-2: sorted by birth date, ascending.");
 console.log("*Output-3: sorted by last name, descending.");
 console.log('---------------------------------------------------------------------------------------');
-//callback get_files function to get records in result.
-get_files(function (result) {
-    rl.question("Please choose one Output type. Enter 1 or 2 or 3:" + "   ", function (inputNumber) {
+// get records in callback.
+get_files(function (callback) {
+    rl.question("Please choose one Output type. Enter Number 1 or 2 or 3:" + "   ", function (inputNumber) {
         var recordArray;
         var messgaeForInputFileName = "";
-        var recordsArray = [];
+        var recordsOfAllFilesArray = [];
+        var txtContentInallFilesArray = [];
+        //take out txt strings for each file from callback and put into txtContentInallFilesArray.
+        for (var key in callback) {
+            if (callback.hasOwnProperty(key)) {
+                txtContentInallFilesArray.push(callback[key]);
+            }
+        }
+        //get all records from all files txt contents and put in one array.
+        for (var j = 0; j < txtContentInallFilesArray.length; j++) {
+            //read records line by line from text contents in each file.
+            var recordsOfOneFileArray = readRecordByLine(txtContentInallFilesArray[j]);
+            for (var i = 0; i < recordsOfOneFileArray.length; i++) {
+                recordsOfAllFilesArray.push(recordsOfOneFileArray[i]);
+            }
+        }
         if (inputNumber === '1') {
             messgaeForInputFileName = "The output-" + inputNumber + " is as following:";
             console.log(messgaeForInputFileName);
-            var txtContent = [];
-            for (var key in result) {
-                if (result.hasOwnProperty(key)) {
-                    txtContent.push(result[key]);
-                }
-            }
-            //put all records from all files into recordsArray.
-            for (var j = 0; j < txtContent.length; j++) {
-                var singleFilerecordArray = readRecordByLine(txtContent[j]);
-                for (var i = 0; i < singleFilerecordArray.length; i++) {
-                    recordsArray.push(singleFilerecordArray[i]);
-                }
-            }
-            var output1Array = sortToOutput1(recordsArray);
+            var output1Array = sortToOutput1(recordsOfAllFilesArray);
             for (var i = 0; i < output1Array.length; i++) {
                 if (i === 0) {
                     console.log('LastName,FirstName,Gender,FavoriteColor,BirthDate');
@@ -90,20 +97,7 @@ get_files(function (result) {
         else if (inputNumber === '2') {
             messgaeForInputFileName = "The output-" + inputNumber + " is as following:";
             console.log(messgaeForInputFileName);
-            var txtContent = [];
-            for (var key in result) {
-                if (result.hasOwnProperty(key)) {
-                    txtContent.push(result[key]);
-                }
-            }
-            //put all records from all files into recordsArray.
-            for (var j = 0; j < txtContent.length; j++) {
-                var singleFilerecordArray = readRecordByLine(txtContent[j]);
-                for (var i = 0; i < singleFilerecordArray.length; i++) {
-                    recordsArray.push(singleFilerecordArray[i]);
-                }
-            }
-            var output2Array = sortToOutput2(recordsArray);
+            var output2Array = sortToOutput2(recordsOfAllFilesArray);
             for (var i = 0; i < output2Array.length; i++) {
                 if (i === 0) {
                     console.log('LastName,FirstName,Gender,FavoriteColor,BirthDate');
@@ -115,20 +109,7 @@ get_files(function (result) {
         else if (inputNumber === '3') {
             messgaeForInputFileName = "The output-" + inputNumber + " is as following:";
             console.log(messgaeForInputFileName);
-            var txtContent = [];
-            for (var key in result) {
-                if (result.hasOwnProperty(key)) {
-                    txtContent.push(result[key]);
-                }
-            }
-            //put all records from all files into recordsArray.
-            for (var j = 0; j < txtContent.length; j++) {
-                var singleFilerecordArray = readRecordByLine(txtContent[j]);
-                for (var i = 0; i < singleFilerecordArray.length; i++) {
-                    recordsArray.push(singleFilerecordArray[i]);
-                }
-            }
-            var output3Array = sortToOutput3(recordsArray);
+            var output3Array = sortToOutput3(recordsOfAllFilesArray);
             for (var i = 0; i < output3Array.length; i++) {
                 if (i === 0) {
                     console.log('LastName,FirstName,Gender,FavoriteColor,BirthDate');
@@ -141,103 +122,65 @@ get_files(function (result) {
             messgaeForInputFileName = "Sorry, You can only enter 1 or 2 or 3";
             console.log(messgaeForInputFileName);
         }
-        //all records store in json data.
-        // var data = arrayToJson(recordArray);
+        //all records store in json array data.
         var data = recordArray;
+        //post data by request method (from command line app client end to RESTful API server end).
         postByRequest(data);
-        //TODO:We can also use post by http.
+        //TODO:We can also use post by http method for post data from client-end to server-end, more coding but effective.
         // postByHttp(data);
     });
 });
 
-//share functions in method
-// var methods = {};
-// methods = {
-//     //sort array by last name ascending
-//     lastNameAscending: function (a, b) {
-//         var A = a[0];
-//         var B = b[0];
-//         A = A.toLowerCase();
-//         B = B.toLowerCase();
-//         if (A < B) return -1;
-//         if (A > B) return 1;
-//         return 0;
-//     },
-//     //sort array by last name descending
-//     lastNameDescending: function (a, b) {
-//         var A = a[0];
-//         var B = b[0];
-//         A = A.toLowerCase();
-//         B = B.toLowerCase();
-//         if (A < B) return 1;
-//         if (A > B) return -1;
-//         return 0;
-//     },
-//     //sort array by birthDate.
-//     birtDateAscending: function (a, b) {
-//         var A = a[4];
-//         var B = b[4];
-//         A = Date.parse(A);
-//         B = Date.parse(B);
-//         if (A > B) return 1;
-//         if (A < B) return -1;
-//         return 0;
-//     },
-//     //return by female first.
-//     ladyFirst: function (records) {
-//         var sexySortArray = [];
-//         for (var i = 0; i < records.length; i++) {
-//             if (records[i][2][0] === "F") {
-//                 sexySortArray.push(records[i]);
-//             }
-//         }
-//         for (var i = 0; i < records.length; i++) {
-//             if (records[i][2][0] === "M") {
-//                 sexySortArray.push(records[i]);
-//             }
-//         }
-//         return sexySortArray;
-//     },
-    //return sorted array for Output-1
-     function sortToOutput1(records) {
-        //sort by lady first.
-        var sexySortArray = methods.ladyFirst(records);
-        //sort by last name and return.
-        return (sexySortArray.sort(methods.lastNameAscending));
-    }
-    //return sorted array for Output-2
-    function sortToOutput2(records) {
-        return (records.sort(methods.birtDateAscending));
-    }
-    //return sorted array for Output-3
-    function sortToOutput3(records) {
-        return (records.sort(methods.lastNameDescending));
-    }
-// };
-//get every single record from signle file into one string array. 
-function readRecordByLine(txtstring) {
-    var singleFileArray = txtstring.split('\r\n');
-    var singleRecordArray = [];
-    if (singleFileArray[0].includes(',')) {
-        for (var i = 0; i < singleFileArray.length; i++) {
-            singleRecordArray.push(singleFileArray[i].split(','));
-        }
-    }
-    else if (singleFileArray[0].includes('|')) {
-        for (var i = 0; i < singleFileArray.length; i++) {
-            singleRecordArray.push(singleFileArray[i].split('|'));
-        }
-    }
-    else if (singleFileArray[0].includes(' ')) {
-        for (var i = 0; i < singleFileArray.length; i++) {
-            singleRecordArray.push(singleFileArray[i].split(' '));
-        }
-    }
-    return singleRecordArray;
+//return sorted array for Output-1
+function sortToOutput1(records) {
+    //sort by lady first.
+    var sexySortArray = methods.ladyFirst(records);
+    //sort by last name and return.
+    return (sexySortArray.sort(methods.lastNameAscending));
+}
+//return sorted array for Output-2
+function sortToOutput2(records) {
+    return (records.sort(methods.birtDateAscending));
+}
+//return sorted array for Output-3
+function sortToOutput3(records) {
+    return (records.sort(methods.lastNameDescending));
 }
 
+//read records from txt line by line, return an array contains all records in one file. 
+function readRecordByLine(txtFromOneFile) {
+    //get records array line by line.
+    //in windows and mac , linux, line break are different. May lead to empty array produced.
+    var splitArray = txtFromOneFile.split(/\r\n|\n|\r/);
+    var txtArrayWithDelimited = [];
+    //get rid of empty array.
+    for (var i = 0; i < splitArray.length; i++) {
+        if (splitArray[i]) {
+            txtArrayWithDelimited.push(splitArray[i]);
+        }
+    }
+    var pureRecordsArray = [];
+    //get pure record without delimited, put each record in one array.
+    if (txtArrayWithDelimited[0].includes(',')) {
+        for (var i = 0; i < txtArrayWithDelimited.length; i++) {
+            pureRecordsArray.push(txtArrayWithDelimited[i].split(','));
+        }
+    }
+    else if (txtArrayWithDelimited[0].includes('|')) {
+        for (var i = 0; i < txtArrayWithDelimited.length; i++) {
+            pureRecordsArray.push(txtArrayWithDelimited[i].split('|'));
+        }
+    }
+    else if (txtArrayWithDelimited[0].includes(' ')) {
+        for (var i = 0; i < txtArrayWithDelimited.length; i++) {
+            pureRecordsArray.push(txtArrayWithDelimited[i].split(' '));
+        }
+    }
+    return pureRecordsArray;
+}
+
+//*****************request method post data from client end to server*********************//
 function postByRequest(data) {
-    //*****************request method post data from client end to server*********************//
     var options = {
         headers: { "Connection": "close" },
         url: 'http://localhost:3000/records',
@@ -245,11 +188,10 @@ function postByRequest(data) {
         json: true,
         body: data
     };
-    request(options, callback);
+    request(options, callbackForRequest);
 }
 //get status from server.
-function callback(error, response, data) {
-    console.log('statuscode:' + response.statusCode);
+function callbackForRequest(error, response, data) {
     if (!error && response.statusCode == 200) {
         console.log('----info------', data);
     }
