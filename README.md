@@ -1,13 +1,19 @@
 # REST_API_OTR
 
-Command line app and the server RESTful API built based on node.js
+##Command line app and the server RESTful API built based on node.js
 
-Unit test use mocha and supertest.
+###Unit test use mocha and supertest.
 
-samples records files in input_files folder:  Pipe-delimited.txt, Space-delimited.txt, Comma-delimited.txt.
+###samples records files in input_files folder:  
+```
+Pipe-delimited.txt, Space-delimited.txt, Comma-delimited.txt.
+```
 
-Environment requirements: Node. Details can be find in package.json. You may need install these moduler if you never use they before.
+###Environment requirements: 
+```
+Node. Details can be find in package.json. You may need install these moduler if you never use they before.
 
+```
 1.Download REST_API_OTR folder and Open terminal, cd to REST_API_OTR folder.
 
 2.Run RESTful server API first by type: "node server.js".
@@ -23,16 +29,18 @@ Environment requirements: Node. Details can be find in package.json. You may nee
 7.You can try open another new terminal to run commandline app and post records at the same time.
 
 8.You can use 'postman' to test the get request for REST API. (google search: "postman google appstore"). 
-
+```
 ● GET /records/gender - returns all records in json format, sorted by gender
 
 ● GET /records/birthdate - returns all records in json format, sorted by birth date
 
 ● GET /records/name - returns all records in json format, sorted by name
-
+```
 
 Unit test: npm Install mocha and supertest.
 
 1.open terminal , cd to REST_API_OTR folder.
 
 2.type 'mocha test'.
+
+3.ctrl+c exit test.
