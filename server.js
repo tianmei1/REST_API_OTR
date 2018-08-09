@@ -121,8 +121,5 @@ function arrayToJson(recordArray) {
 var server = http.createServer(app).listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
 });
-<<<<<<< HEAD
 
 module.exports = server
-=======
->>>>>>> 189adc01b00d96c774d6b57269c9369b307bf55d
